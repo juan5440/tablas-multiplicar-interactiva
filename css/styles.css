@@ -1,0 +1,187 @@
+
+        * {
+            font-family: 'Nunito', sans-serif;
+        }
+        .title-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            75% { transform: translateY(-10px) rotate(-5deg); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            50% { box-shadow: 0 0 40px rgba(255,255,255,0.8); }
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            50% { transform: scale(1.3) rotate(10deg); }
+            75% { transform: scale(1.2) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @keyframes countdown {
+            0% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        @keyframes rocket {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
+        .animate-wiggle { animation: wiggle 0.5s ease-in-out infinite; }
+        .animate-pop { animation: pop 0.4s ease-out forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        .animate-celebrate { animation: celebrate 0.6s ease-in-out; }
+        .animate-shake { animation: shake 0.5s ease-in-out; }
+        .animate-countdown { animation: countdown 1s ease-out; }
+        .animate-rocket { animation: rocket 2s ease-in-out infinite; }
+        .animate-spin { animation: spin 3s linear infinite; }
+        
+        .game-btn {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .game-btn:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+        
+        .game-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .table-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .table-card:hover {
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        .space-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .space-bg::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, white, transparent),
+                radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 160px 120px, white, transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 5s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .candy-bg {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 50%, #a18cd1 100%);
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+        }
+        
+        .jungle-bg {
+            background: linear-gradient(135deg, #134e5e 0%, #71b280 50%, #2d5016 100%);
+        }
+        
+        .ocean-bg {
+            background: linear-gradient(135deg, #0077b6 0%, #00b4d8 50%, #90e0ef 100%);
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .number-input {
+            -moz-appearance: textfield;
+        }
+        
+        .number-input::-webkit-outer-spin-button,
+        .number-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .star { position: fixed; pointer-events: none; z-index: 1000; }
+        .confetti { position: fixed; pointer-events: none; z-index: 1000; }
+        /* Capa de fondo personalizada (queda siempre detrás) */
+        #bgLayer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: none;
+            pointer-events: none;
+            transition: opacity 300ms ease;
+        }
+
+        /* Asegurar que el contenido de la app quede por encima del fondo
+           y que la imagen de fondo sea visible en todas las pantallas */
+        #mainMenu, [id$="Screen"], [id$="Menu"] {
+            position: relative;
+            z-index: 1;
+            background: transparent !important;
+        }
+        
+        .combo-fire {
+            text-shadow: 0 0 10px #ff6b00, 0 0 20px #ff6b00, 0 0 30px #ff0000;
+        }
+    

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Aprende las Tablas - ¡Matemáticas Divertidas!</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="min-h-screen candy-bg overflow-x-hidden">
+    <!-- Capa de fondo personalizable (queda detrás de todo) -->
+    <div id="bgLayer" aria-hidden="true"></div>
+    <!-- Reproductor de música para Batalla -->
+    <audio id="battleMusic" loop aria-hidden="true"></audio>
+    
+    <!-- Pantalla Principal -->
+    <div id="mainMenu" class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="text-center mb-8">
+            <div class="text-6xl md:text-8xl mb-4 animate-bounce-slow">🚀</div>
+            <h1 class="title-font text-4xl md:text-6xl text-white drop-shadow-lg mb-4">
+                ¡Aprende las Tablas!
+            </h1>
+            <p class="text-xl md:text-2xl text-white/90 drop-shadow-md">¡Las matemáticas son divertidas! 🎮✨</p>
+        </div>
+        <!-- Controles de fondo personalizable (imagen, URL, limpiar) -->
+        <div class="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <input type="file" id="bgFileInput" accept="image/*" class="hidden" />
+            <button onclick="document.getElementById('bgFileInput').click()" class="game-btn bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm sm:text-base">📁 Elegir imagen</button>
+            <input id="bgUrlInput" placeholder="Pegar URL de imagen" class="px-3 py-2 rounded-lg text-sm sm:text-base" style="min-width:180px" />
+            <button onclick="applyBgUrl()" class="game-btn bg-white/90 px-3 py-2 rounded-full shadow-lg text-sm sm:text-base">🌐 Usar URL</button>
+            <button onclick="clearBackground()" class="game-btn bg-white/90 px-3 py-2 rounded-full shadow-lg text-sm sm:text-base">❌ Borrar</button>
+        </div>
+        <!-- Controles para música de batalla -->
+        <div class="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <input type="file" id="battleMusicFileInput" accept="audio/*" class="hidden" />
+            <button onclick="document.getElementById('battleMusicFileInput').click()" class="game-btn bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm sm:text-base">🎵 Seleccionar música batalla</button>
+            <input id="battleMusicUrlInput" placeholder="Pegar URL de audio" class="px-3 py-2 rounded-lg text-sm sm:text-base" style="min-width:180px" />
+            <button onclick="applyBattleMusicUrl()" class="game-btn bg-white/90 px-3 py-2 rounded-full shadow-lg text-sm sm:text-base">🌐 Usar URL</button>
+            <button onclick="clearBattleMusic()" class="game-btn bg-white/90 px-3 py-2 rounded-full shadow-lg text-sm sm:text-base">❌ Borrar</button>
+        </div>
+        <!-- Controles de opacidad/blur/posición/tamaño -->
+        <div class="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <label class="text-white">Opacidad</label>
+            <input id="bgOpacityRange" type="range" min="0" max="1" step="0.01" value="1" />
+            <span id="bgOpacityLabel" class="text-white">100%</span>
+
+            <label class="text-white ml-3">Blur</label>
+            <input id="bgBlurRange" type="range" min="0" max="20" step="1" value="0" />
+            <span id="bgBlurLabel" class="text-white">0px</span>
+
+            <label class="text-white ml-3">Posición</label>
+            <select id="bgPositionSelect" class="px-2 py-1 rounded">
+                <option value="center">Centro</option>
+                <option value="top">Arriba</option>
+                <option value="left">Izquierda</option>
+            </select>
+
+            <label class="text-white ml-3">Tamaño</label>
+            <select id="bgSizeSelect" class="px-2 py-1 rounded">
+                <option value="cover">Cover</option>
+                <option value="contain">Contain</option>
+            </select>
+        </div>
+        <!-- Control de selección de voz (igual que en abc-interactivo) -->
+        <div class="flex items-center justify-center gap-3 mb-6 flex-wrap">
+            <label for="voiceSelect" class="text-white text-sm sm:text-base">Voz:</label>
+            <select id="voiceSelect" class="px-3 py-2 rounded-lg text-sm sm:text-base">
+                <option value="">Predeterminada</option>
+            </select>
+            <button id="refreshVoices" onclick="populateVoiceList()" class="game-btn bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm sm:text-base">🔁</button>
+            <span id="currentVoiceLabel" class="text-white ml-3 text-sm sm:text-base">Predeterminada</span>
+            <button id="previewVoice" class="game-btn bg-white/90 px-3 py-2 rounded-full shadow-lg ml-2 text-sm sm:text-base" title="Haz clic para escuchar ejemplo">🔊</button>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-4xl w-full px-4">
+            <!-- Botón Explorar Tablas -->
+            <button onclick="showScreen('explore')" class="game-btn bg-gradient-to-br from-yellow-400 to-orange-500 p-4 sm:p-6 rounded-3xl shadow-2xl text-white animate-pulse-glow">
+                <div class="text-4xl sm:text-5xl mb-2">📚</div>
+                <h2 class="title-font text-lg sm:text-xl">Explorar Tablas</h2>
+                <p class="text-sm opacity-90">Aprende cada tabla paso a paso</p>
+            </button>
+            
+            <!-- Botón Quiz Rápido -->
+            <button onclick="showScreen('quiz')" class="game-btn bg-gradient-to-br from-green-400 to-emerald-600 p-4 sm:p-6 rounded-3xl shadow-2xl text-white">
+                <div class="text-4xl sm:text-5xl mb-2">🎯</div>
+                <h2 class="title-font text-lg sm:text-xl">Quiz Rápido</h2>
+                <p class="text-sm opacity-90">¡Pon a prueba tu memoria!</p>
+            </button>
+            
+            <!-- Botón Desafío Contrarreloj -->
+            <button onclick="showScreen('challenge')" class="game-btn bg-gradient-to-br from-red-400 to-pink-600 p-4 sm:p-6 rounded-3xl shadow-2xl text-white">
+                <div class="text-4xl sm:text-5xl mb-2">⏱️</div>
+                <h2 class="title-font text-lg sm:text-xl">Contrarreloj</h2>
+                <p class="text-sm opacity-90">¿Cuántas puedes resolver?</p>
+            </button>
+            
+            <!-- Botón Batalla de Números -->
+            <button onclick="showScreen('battle')" class="game-btn bg-gradient-to-br from-purple-400 to-indigo-600 p-4 sm:p-6 rounded-3xl shadow-2xl text-white">
+                <div class="text-4xl sm:text-5xl mb-2">⚔️</div>
+                <h2 class="title-font text-lg sm:text-xl">Batalla Matemática</h2>
+                <p class="text-sm opacity-90">¡Derrota a los monstruos!</p>
+            </button>
+        </div>
+        
+        <!-- Mascota -->
+        <div class="mt-8 flex items-center gap-2 sm:gap-4">
+            <div class="text-5xl sm:text-6xl animate-float">🦊</div>
+            <div class="bg-white/90 rounded-2xl p-3 sm:p-4 shadow-lg max-w-[200px] sm:max-w-xs">
+                <p class="text-gray-700 font-bold text-sm sm:text-base">¡Hola amiguito! ¿Listo para ser un campeón de las tablas? 🏆</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Explorar Tablas -->
+    <div id="exploreScreen" class="min-h-screen p-4 hidden ocean-bg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-6 flex-wrap">
+                <button onclick="showScreen('main')" class="game-btn bg-white/90 px-4 py-2 rounded-full text-base shadow-lg">
+                    ⬅️ Volver
+                </button>
+                <h2 class="title-font text-xl md:text-3xl text-white drop-shadow-lg">📚 Elige una Tabla</h2>
+                <div class="w-10 md:w-20"></div>
+            </div>
+            
+            <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+                <!-- Generado con JS -->
+            </div>
+        </div>
+        
+        <!-- Modal de tabla -->
+        <div id="tableModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm md:max-w-md w-full text-center shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 id="modalTableTitle" class="title-font text-3xl md:text-4xl text-purple-600 mb-6"></h3>
+                <div id="modalTableContent" class="space-y-3 mb-6">
+                    <!-- Contenido de la tabla -->
+                </div>
+                <div class="flex gap-3 justify-center flex-wrap">
+                    <button onclick="speakTable()" class="game-btn bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-6 py-3 rounded-full text-lg">
+                        🔊 Escuchar
+                    </button>
+                    <button onclick="practiceTable()" class="game-btn bg-gradient-to-r from-green-400 to-green-600 text-white px-6 py-3 rounded-full text-lg">
+                        🎮 Practicar
+                    </button>
+                    <button onclick="closeTableModal()" class="game-btn bg-gradient-to-r from-gray-400 to-gray-500 text-white px-6 py-3 rounded-full text-lg">
+                        ✖️ Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Práctica Individual -->
+    <div id="practiceScreen" class="min-h-screen p-4 hidden jungle-bg">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('explore')" class="game-btn bg-white/90 px-5 py-3 rounded-full text-xl shadow-lg">
+                    ⬅️ Volver
+                </button>
+                <div class="flex gap-3">
+                    <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">✅</span>
+                        <span id="practiceCorrect" class="title-font text-xl text-green-600">0</span>
+                    </div>
+                    <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">❌</span>
+                        <span id="practiceWrong" class="title-font text-xl text-red-500">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white/95 rounded-3xl p-6 md:p-10 shadow-2xl text-center">
+                <p id="practiceTableLabel" class="text-xl text-gray-500 mb-2">Tabla del</p>
+                <div class="flex items-center justify-center gap-3 md:gap-5 mb-8 flex-wrap">
+                    <span id="practiceNum1" class="text-5xl md:text-7xl title-font text-purple-600"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">×</span>
+                    <span id="practiceNum2" class="text-5xl md:text-7xl title-font text-blue-500"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">=</span>
+                    <span id="practiceAnswer" class="text-5xl md:text-7xl title-font text-green-500">?</span>
+                </div>
+                
+                <div id="practiceOptions" class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    <!-- Opciones generadas con JS -->
+                </div>
+                
+                <div id="practiceFeedback" class="mt-6 text-2xl hidden"></div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <div class="text-7xl animate-rocket">🦁</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Quiz Rápido -->
+    <div id="quizScreen" class="min-h-screen p-4 hidden space-bg">
+        <div class="max-w-2xl mx-auto relative z-10">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('main')" class="game-btn bg-white/90 px-5 py-3 rounded-full text-xl shadow-lg">
+                    ⬅️ Volver
+                </button>
+                <div class="flex gap-3">
+                    <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">⭐</span>
+                        <span id="quizScore" class="title-font text-xl text-purple-600">0</span>
+                    </div>
+                    <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">🔥</span>
+                        <span id="quizCombo" class="title-font text-xl text-orange-500">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progreso -->
+            <div class="bg-white/30 rounded-full h-4 mb-6 overflow-hidden">
+                <div id="quizProgress" class="progress-bar bg-gradient-to-r from-yellow-400 to-green-400 h-full rounded-full" style="width: 0%"></div>
+            </div>
+            
+            <div class="bg-white/95 rounded-3xl p-6 md:p-10 shadow-2xl text-center">
+                <p class="text-lg text-gray-500 mb-2">Pregunta <span id="quizQuestionNum">1</span> de <span id="quizTotalQuestions">10</span></p>
+                
+                <div class="flex items-center justify-center gap-3 md:gap-5 mb-8">
+                    <span id="quizNum1" class="text-5xl md:text-7xl title-font text-purple-600"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">×</span>
+                    <span id="quizNum2" class="text-5xl md:text-7xl title-font text-blue-500"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">=</span>
+                    <span class="text-5xl md:text-7xl title-font text-green-500">?</span>
+                </div>
+                
+                <div id="quizOptions" class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    <!-- Opciones -->
+                </div>
+                
+                <div id="quizFeedback" class="mt-6 text-2xl hidden"></div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <div class="text-7xl animate-float">🚀</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Quiz Resultados -->
+    <div id="quizResultsScreen" class="min-h-screen p-4 hidden candy-bg">
+        <div class="max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen">
+            <div class="bg-white/95 rounded-3xl p-8 md:p-12 shadow-2xl text-center w-full">
+                <div class="text-7xl md:text-8xl mb-4 animate-celebrate">🏆</div>
+                <h2 class="title-font text-3xl md:text-4xl text-purple-600 mb-6">¡Terminaste!</h2>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-green-100 rounded-2xl p-4">
+                        <div class="text-4xl">✅</div>
+                        <p class="title-font text-3xl text-green-600" id="resultCorrect">0</p>
+                        <p class="text-gray-600">Correctas</p>
+                    </div>
+                    <div class="bg-red-100 rounded-2xl p-4">
+                        <div class="text-4xl">❌</div>
+                        <p class="title-font text-3xl text-red-500" id="resultWrong">0</p>
+                        <p class="text-gray-600">Incorrectas</p>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-100 rounded-2xl p-4 mb-6">
+                    <div class="text-4xl">⭐</div>
+                    <p class="title-font text-4xl text-yellow-600" id="resultScore">0</p>
+                    <p class="text-gray-600">Puntos totales</p>
+                </div>
+                
+                <p id="resultMessage" class="text-xl text-gray-700 mb-6"></p>
+                
+                <div class="flex gap-4 justify-center flex-wrap">
+                    <button onclick="startQuiz()" class="game-btn bg-gradient-to-r from-green-400 to-green-600 text-white px-8 py-4 rounded-full text-xl">
+                        🔄 Jugar de nuevo
+                    </button>
+                    <button onclick="showScreen('main')" class="game-btn bg-gradient-to-r from-purple-400 to-purple-600 text-white px-8 py-4 rounded-full text-xl">
+                        🏠 Menú
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Contrarreloj -->
+    <div id="challengeScreen" class="min-h-screen p-4 hidden space-bg">
+        <div class="max-w-2xl mx-auto relative z-10">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="endChallenge()" class="game-btn bg-white/90 px-5 py-3 rounded-full text-xl shadow-lg">
+                    ⬅️ Salir
+                </button>
+                <div class="flex gap-3">
+                    <div class="bg-gradient-to-r from-red-500 to-orange-500 px-5 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">⏱️</span>
+                        <span id="challengeTimer" class="title-font text-2xl text-white">60</span>
+                    </div>
+                    <div class="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">⭐</span>
+                        <span id="challengeScore" class="title-font text-xl text-purple-600">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white/95 rounded-3xl p-6 md:p-10 shadow-2xl text-center">
+                <div id="challengeCombo" class="text-2xl mb-4 hidden">
+                    <span class="combo-fire">🔥 COMBO x<span id="comboMultiplier">2</span>!</span>
+                </div>
+                
+                <div class="flex items-center justify-center gap-3 md:gap-5 mb-8">
+                    <span id="challengeNum1" class="text-5xl md:text-7xl title-font text-purple-600"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">×</span>
+                    <span id="challengeNum2" class="text-5xl md:text-7xl title-font text-blue-500"></span>
+                    <span class="text-4xl md:text-6xl title-font text-gray-400">=</span>
+                </div>
+                
+                <input type="number" id="challengeInput" 
+                    class="number-input w-40 text-5xl title-font text-center border-4 border-purple-300 rounded-2xl p-4 focus:border-purple-500 focus:outline-none"
+                    placeholder="?"
+                    onkeypress="handleChallengeKeypress(event)">
+                
+                <div class="mt-6">
+                    <button onclick="checkChallengeAnswer()" class="game-btn bg-gradient-to-r from-green-400 to-green-600 text-white px-10 py-4 rounded-full text-2xl">
+                        ✓ Enviar
+                    </button>
+                </div>
+                
+                <div id="challengeFeedback" class="mt-4 text-2xl hidden"></div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <div class="text-7xl animate-spin">⚡</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pantalla Batalla -->
+    <div id="battleScreen" class="min-h-screen p-4 hidden" style="background: linear-gradient(135deg, #2c003e 0%, #512b58 50%, #1a1a2e 100%);">
+        <div class="max-w-2xl mx-auto relative z-10">
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="showScreen('main')" class="game-btn bg-white/90 px-5 py-3 rounded-full text-xl shadow-lg">
+                    ⬅️ Huir
+                </button>
+                <div class="flex gap-3">
+                    <div class="bg-red-500/90 px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+                        <span class="text-xl">❤️</span>
+                        <span id="playerHealth" class="title-font text-xl text-white">100</span>
+                    </div>
+                    <div class="bg-yellow-500/90 px-4 py-2 rounded-full shadow-lg">
+                        <span class="text-xl">🏆</span>
+                        <span id="battleWins" class="title-font text-xl text-white">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Monstruo -->
+            <div class="bg-black/30 rounded-3xl p-6 mb-4 text-center">
+                <div id="monsterEmoji" class="text-7xl md:text-8xl mb-2 animate-wiggle">👾</div>
+                <p id="monsterName" class="title-font text-2xl text-white mb-2">Monstruo Numérico</p>
+                <div class="bg-gray-700 rounded-full h-6 overflow-hidden max-w-xs mx-auto">
+                    <div id="monsterHealthBar" class="bg-gradient-to-r from-green-400 to-green-600 h-full transition-all duration-300" style="width: 100%"></div>
+                </div>
+                <p class="text-white mt-1">❤️ <span id="monsterHealth">100</span>/100</p>
+            </div>
+            
+            <!-- Pregunta de batalla -->
+            <div class="bg-white/95 rounded-3xl p-6 shadow-2xl text-center">
+                <p class="text-lg text-gray-500 mb-4">¡Resuelve para atacar! ⚔️</p>
+                
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <span id="battleNum1" class="text-4xl md:text-5xl title-font text-purple-600"></span>
+                    <span class="text-3xl md:text-4xl title-font text-gray-400">×</span>
+                    <span id="battleNum2" class="text-4xl md:text-5xl title-font text-blue-500"></span>
+                    <span class="text-3xl md:text-4xl title-font text-gray-400">=</span>
+                    <span class="text-4xl md:text-5xl title-font text-green-500">?</span>
+                </div>
+                
+                <div id="battleOptions" class="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+                    <!-- Opciones -->
+                </div>
+                
+                <div id="battleFeedback" class="mt-4 text-xl hidden"></div>
+            </div>
+            
+            <!-- Jugador -->
+            <div class="text-center mt-4">
+                <div class="text-6xl animate-bounce-slow">🧙‍♂️</div>
+                <p class="title-font text-xl text-white">¡Tú!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/scripts.js"></script>
+</body>
+</html>
