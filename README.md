@@ -1,5 +1,4 @@
 # 🎮 Aprende las Tablas - ¡Matemáticas Divertidas!
-
 ## Descripción
 **Aprende las Tablas** es un juego educativo diseñado para hacer que el aprendizaje de las tablas de multiplicar sea divertido y emocionante. Con múltiples modos de juego, animaciones interactivas y una interfaz amigable, este proyecto es ideal para niños y adultos que desean mejorar sus habilidades matemáticas.
 
@@ -22,7 +21,7 @@
 - Conexión a internet para cargar recursos externos (opcional).
 
 ### Cómo Jugar
-1. **Abrir el Juego**: Abre el archivo `tablas.html` en tu navegador.
+1. **Abrir el Juego**: Abre el archivo `index.html` en tu navegador.
 2. **Seleccionar un Modo**:
    - Explorar Tablas: Aprende paso a paso.
    - Quiz Rápido: Responde preguntas rápidas.
@@ -38,7 +37,7 @@
 ## 🛠️ Documentación Técnica
 
 ### Estructura del Proyecto
-- **tablas.html**: Archivo principal que contiene la estructura del juego.
+- **index.html**: Archivo principal que contiene la estructura del juego.
 - **CSS Inline**: Estilos personalizados para animaciones y diseño.
 - **JavaScript Inline**: Lógica del juego, manejo de eventos y animaciones.
 
@@ -52,7 +51,7 @@
    ```bash
    git clone https://github.com/tu-usuario/aprende-las-tablas.git
    ```
-2. Abre el archivo `tablas.html` en tu navegador.
+2. Abre el archivo `index.html` en tu navegador.
 
 ### Personalización
 - **Fondo**: Modifica el elemento `#bgLayer` para cambiar el fondo.
@@ -81,10 +80,3 @@ Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para má
 ---
 
 ## 🌟 Agradecimientos
-- **Tailwind CSS** por facilitar el diseño.
-- **Google Fonts** por las increíbles fuentes.
-- **Speech Synthesis API** por hacer el juego más interactivo.
-
----
-
-¡Diviértete aprendiendo matemáticas! 🎉
